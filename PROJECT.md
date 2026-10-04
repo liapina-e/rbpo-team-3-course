@@ -174,3 +174,4 @@ TempShare — серверное приложение с HTTP API для пер�
 ## Документы проекта
 
 - [Требования безопасности](security-requirements.md)
+- [Модель угроз](threat-model.md)
