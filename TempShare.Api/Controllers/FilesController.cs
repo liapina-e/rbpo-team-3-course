@@ -24,8 +24,9 @@ public class FilesController : ControllerBase
     }
 
     [HttpPost]
+    [Consumes("multipart/form-data")]
     [RequestSizeLimit(52_428_800)]
-    public async Task<IActionResult> Upload([FromForm] IFormFile file)
+    public async Task<IActionResult> Upload(IFormFile file)
     {
         if (file is null || file.Length == 0)
             return BadRequest("File is required.");
