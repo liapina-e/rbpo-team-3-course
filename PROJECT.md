@@ -164,14 +164,28 @@ TempShare — серверное приложение с HTTP API для пер�
 
 ## 10. Локальный запуск
 
-*Заполняется после появления запускаемой основы, обязательно к EK1.*
+**Требования к окружению:** .NET SDK 8.0.401 или новее в линейке 8.0 (`global.json`), Docker с Docker Compose, свободный порт 5432.
 
-**Требования к окружению:**  
-**Команды установки и запуска:**  
-**Команда или запрос для проверки:**  
-**Ожидаемый результат:**
+**Команды установки и запуска:**
+
+```bash
+docker compose up -d
+dotnet run --project TempShare.Api
+```
+
+Миграции базы данных применяются при запуске приложения.
+
+**Команда или запрос для проверки:**
+
+```bash
+curl -i -X POST http://localhost:5000/api/auth/register -H "Content-Type: application/json" -d '{"username":"alice","password":"alice-pass"}'
+```
+
+**Ожидаемый результат:** ответ `200 OK` с телом `{"token":"..."}`. Swagger UI доступен по адресу `http://localhost:5000/swagger`.
 
 ## Документы проекта
 
 - [Требования безопасности](security-requirements.md)
 - [Модель угроз](threat-model.md)
+- [Проектные решения](design-decisions.md)
+- [Вклад участников](CONTRIBUTIONS.md)
