@@ -10,6 +10,8 @@ public class JwtTokenService
     private readonly IConfiguration _config;
     public JwtTokenService(IConfiguration config) => _config = config;
 
+    private static readonly TimeSpan TokenLifetime = TimeSpan.FromMinutes(60);
+
     public string CreateToken(User user)
     {
         byte[] key = Encoding.UTF8.GetBytes(_config["Jwt:Key"]!);
@@ -20,12 +22,13 @@ public class JwtTokenService
             new Claim(ClaimTypes.Name, user.Username)
         };
 
-        var creds = new SigningCredentials(
-            new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256);
+        SigningCredentials creds = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256);
 
-        var token = new JwtSecurityToken(
+        JwtSecurityToken token = new JwtSecurityToken(
+            issuer: _config["Jwt:Issuer"],
+            audience: _config["Jwt:Audience"],
             claims: claims,
-            expires: DateTime.UtcNow.AddHours(8),
+            expires: DateTime.UtcNow.Add(TokenLifetime),
             signingCredentials: creds);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
