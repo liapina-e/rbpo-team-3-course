@@ -166,6 +166,16 @@ TempShare — серверное приложение с HTTP API для пер�
 
 **Требования к окружению:** .NET SDK 8.0.401 или новее в линейке 8.0 (`global.json`), Docker с Docker Compose, свободный порт 5433.
 
+**Ключ подписи токенов:** в репозитории его нет (D-03). Перед запуском задайте случайный ключ не короче 32 байт в переменной окружения `Jwt__Key`, иначе регистрация и вход завершаются ошибкой `500`.
+
+```powershell
+$b = New-Object byte[] 48; [Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($b); $env:Jwt__Key = [Convert]::ToBase64String($b)
+```
+
+```bash
+export Jwt__Key="$(openssl rand -base64 48)"
+```
+
 **Команды установки и запуска:**
 
 ```bash

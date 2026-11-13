@@ -6,6 +6,7 @@
 | --- | --- | --- |
 | Требования безопасности SR-01–SR-07 | Сформулированы требования и критерии приёмки | [PR #2](https://github.com/liapina-e/rbpo-team-3-course/pull/2), [security-requirements.md](security-requirements.md) |
 | Выдача и отзыв разрешений | Реализованы выдача и отзыв с проверкой владельца файла | [PR #6](https://github.com/liapina-e/rbpo-team-3-course/pull/6) |
+| Подтверждение SR-02 и цепочка EC-02 | Написаны проверки: владелец выдаёт и отзывает разрешения; получатель не может продлить своё разрешение или выдать его другому; не владелец не может отозвать разрешение; после отказа разрешения не меняются | [EC-02](EC-02-permission-owner-only.md), [PermissionOwnershipTests.cs](TempShare.Tests/PermissionOwnershipTests.cs) |
 
 ## M2
 
