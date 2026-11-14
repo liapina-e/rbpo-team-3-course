@@ -164,34 +164,60 @@ TempShare — серверное приложение с HTTP API для пер�
 
 ## 10. Локальный запуск
 
-**Требования к окружению:** .NET SDK 8.0.401 или новее в линейке 8.0 (`global.json`), Docker с Docker Compose, свободный порт 5433.
+**Требования к окружению:** .NET SDK 8.0.401 или новее в линейке 8.0 (`global.json`), Docker с Docker Compose, свободные порты 5433 и 8080.
 
-**Ключ подписи токенов:** в репозитории его нет (D-03). Перед запуском задайте случайный ключ не короче 32 байт в переменной окружения `Jwt__Key`, иначе регистрация и вход завершаются ошибкой `500`.
+**Ключ подписи токенов:** в репозитории его нет (D-03). Compose берёт его из файла `.env` в корне репозитория, который не коммитится. Образец – `.env.example`. Без ключа стенд не запускается.
+
+```bash
+printf 'JWT_KEY=%s\n' "$(openssl rand -base64 48)" > .env
+```
+
+```powershell
+$b = New-Object byte[] 48; [Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($b); "JWT_KEY=$([Convert]::ToBase64String($b))" | Out-File -Encoding ascii .env
+```
+
+### Стенд в Docker
+
+База и приложение поднимаются одной командой. Приложение стартует после того, как база ответила на проверку готовности, и при запуске применяет миграции.
+
+**Команды установки и запуска:**
+
+```bash
+docker compose up --build -d
+```
+
+**Команда или запрос для проверки:**
+
+```bash
+curl -i -X POST http://localhost:8080/api/auth/register -H "Content-Type: application/json" -d '{"username":"alice","password":"alice-pass"}'
+```
+
+**Ожидаемый результат:** ответ `200 OK` с телом `{"token":"..."}`. Swagger UI доступен по адресу `http://localhost:8080/swagger`.
+
+Остановить стенд: `docker compose down`.
+
+### Запуск приложения без контейнера
+
+Для разработки можно поднять в Docker только базу, а приложение запустить через `dotnet run`. Ключ тогда задаётся переменной окружения `Jwt__Key`, иначе регистрация и вход завершаются ошибкой `500`.
+
+```bash
+export Jwt__Key="$(openssl rand -base64 48)"
+```
 
 ```powershell
 $b = New-Object byte[] 48; [Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($b); $env:Jwt__Key = [Convert]::ToBase64String($b)
 ```
 
 ```bash
-export Jwt__Key="$(openssl rand -base64 48)"
-```
-
-**Команды установки и запуска:**
-
-```bash
-docker compose up -d
+docker compose up -d db
 dotnet run --project TempShare.Api
 ```
 
-Миграции базы данных применяются при запуске приложения.
+Проверка – тот же запрос на `http://localhost:5000/api/auth/register`, Swagger UI – `http://localhost:5000/swagger`.
 
-**Команда или запрос для проверки:**
+### Сборка и тесты в CI
 
-```bash
-curl -i -X POST http://localhost:5000/api/auth/register -H "Content-Type: application/json" -d '{"username":"alice","password":"alice-pass"}'
-```
-
-**Ожидаемый результат:** ответ `200 OK` с телом `{"token":"..."}`. Swagger UI доступен по адресу `http://localhost:5000/swagger`.
+При каждом пуше GitHub Actions собирает решение и выполняет тесты (`.github/workflows/ci.yml`). Результат прогона с номером проверенного коммита (`Evidence/run-info.txt`) и отчётом тестов сохраняется артефактом `ci-evidence-<commit>`.
 
 ## Документы проекта
 

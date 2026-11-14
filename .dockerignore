@@ -1,0 +1,12 @@
+.git
+.github
+.idea
+.vs
+**/bin
+**/obj
+TestResults
+Evidence
+storage
+.env
+.env.*
+*.user
